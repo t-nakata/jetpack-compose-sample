@@ -1,111 +1,94 @@
 package com.axiaworks.jetpack_compose_sample
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.animateContentSize
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
+import coil.size.Scale
+import coil.transform.CircleCropTransformation
+import com.axiaworks.jetpack_compose_sample.qiita.QiitaInfo
 
 class MainActivity : ComponentActivity() {
+    val qiitaViewModel by viewModels<QiitaViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeTutorialTheme {
-                Conversation(messages = SampleData.conversationSample)
-            }
-        }
-    }
-}
-
-data class Message(val author: String, val body: String)
-
-@Composable
-fun MessageCard(msg: Message) {
-    Row(modifier = Modifier.padding(all = 8.dp)) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_axiaworks),
-            contentDescription = "Contact profile picture",
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-
-        var isExpanded by remember { mutableStateOf(false) }
-        val surfaceColor: Color by animateColorAsState(
-            if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        )
-        Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
-            Text(
-                text = msg.author,
-                color = MaterialTheme.colors.secondaryVariant,
-                style = MaterialTheme.typography.subtitle2
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                elevation = 1.dp,
-                color = surfaceColor,
-                modifier = Modifier.animateContentSize().padding(1.dp)
-            ) {
-                Text(
-                    text = msg.body,
-                    modifier = Modifier.padding(all = 4.dp),
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.body2
-                )
+                InfoList(items = qiitaViewModel.qiitaInfoList)
+                qiitaViewModel.fetchItemList("Android")
             }
         }
     }
 }
 
 @Composable
-fun Conversation(messages: List<Message>) {
+fun InfoList(items: List<QiitaInfo>) {
     LazyColumn {
-        items(messages) { message ->
-            MessageCard(message)
+        itemsIndexed(items = items) { index, item ->
+            QiitaItem(item = item, index)
         }
     }
 }
 
-@Preview(name = "Light Mode")
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-)
+@ExperimentalCoilApi
 @Composable
-fun PreviewMessageCard() {
-    ComposeTutorialTheme {
-        MessageCard(
-            msg = Message("Colleague", "Hey, take a look at Jetpack Compose, it's great!")
-        )
-    }
-}
+fun QiitaItem(item: QiitaInfo, index: Int) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp, 4.dp)
+            .fillMaxWidth()
+            .height(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = 4.dp
+    ) {
+        Row(
+            Modifier
+                .padding(4.dp)
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-@Preview
-@Composable
-fun PreviewConversation() {
-    ComposeTutorialTheme {
-        Conversation(messages = SampleData.conversationSample)
+            Image(
+                painter = rememberImagePainter(
+                    data = item.qiitaUser.profile_image_url,
+                    builder = {
+                        scale(Scale.FILL)
+                        placeholder(R.drawable.logo_axiaworks)
+                        transformations(CircleCropTransformation())
+                    }
+                ),
+                contentDescription = item.url,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(80.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.body1,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Left
+            )
+        }
     }
 }
