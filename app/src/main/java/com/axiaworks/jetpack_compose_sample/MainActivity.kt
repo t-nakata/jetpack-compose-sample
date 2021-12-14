@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeTutorialTheme {
                 Conversation(messages = SampleData.conversationSample)
-//                MessageCard(Message("Axia Works LLC", "Mobile App & Web System　Developers"))
             }
         }
     }
@@ -109,21 +108,4 @@ fun PreviewConversation() {
     ComposeTutorialTheme {
         Conversation(messages = SampleData.conversationSample)
     }
-}
-
-
-object SampleData {
-    val conversationSample: List<Message> = listOf(
-        Message(author = "なかた", body = "Jetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose\nJetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-        Message(author = "なかた", body = "Jetpack compose\nJetpack compose"),
-    )
 }
